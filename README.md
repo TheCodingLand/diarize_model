@@ -57,7 +57,10 @@ You can replace or extend the synthetic dataset with your own data. Simply ensur
 - [ClearML](https://clear.ml/) (optional, for experiment tracking)
 - NumPy
 - (Optional) [torchaudio](https://pytorch.org/audio/stable/) for data preprocessing
-
+- pydantic-settings
+- pydub
+- ffmpeg
+  
 ## Usage
 
 ### Training the Model
