@@ -4,7 +4,7 @@
 import torch
 from diarization import ArcFaceLoss, SyntheticDiarizationDataset, TransformerDiarizationModel
 
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
 from settings import config
 import torch.nn as nn
 import torch.nn.functional as F
@@ -16,7 +16,7 @@ def train():
     # Initialize dataset and model. (Dataset parameters override num_speakers, etc.)
     dataset = SyntheticDiarizationDataset(num_samples=1000, num_speakers=6, num_events=4, num_moods=5)
     model = TransformerDiarizationModel(dataset.num_speakers, dataset.num_events, dataset.num_moods)
-    dataloader = DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
+    dataloader: DataLoader[SyntheticDiarizationDataset] = DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
 
     criterion_speaker = ArcFaceLoss()
     criterion_event = nn.CrossEntropyLoss()
@@ -56,17 +56,9 @@ def train():
     torch.save(model.state_dict(), "diarization_model.pth")
 
 
-def test_inference():
-    model = TransformerDiarizationModel(config.num_speakers, config.num_events, config.num_moods)
-    model.load_state_dict(torch.load("diarization_model.pth"))
-    model.eval()
-    # Generate synthetic input features.
-    inputs = torch.randn(1, config.seq_length, config.input_features)
-    speaker_logits, event_logits, mood_logits = model(inputs)
-    print("Inference completed!") 
-    print(speaker_logits.shape, event_logits.shape, mood_logits.shape)  
-    print(speaker_logits[0, :10, :])  # Print first 10 time steps of speaker logits.
+
 
 if __name__ == "__main__":
     train()
+    from infer import test_inference
     test_inference()

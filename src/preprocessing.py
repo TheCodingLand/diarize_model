@@ -13,7 +13,9 @@ def preprocess_audio(file_path: str, target_sample_rate: int = 16000) -> torch.T
     Returns:
         torch.Tensor: Normalized audio waveform.
     """
-    waveform, sample_rate = torchaudio.load(file_path)
+    waveform: torch.Tensor
+    sample_rate: int
+    waveform, sample_rate = torchaudio.load(file_path)  # type: ignore
     if sample_rate != target_sample_rate:
         resampler = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=target_sample_rate)
         waveform = resampler(waveform)
