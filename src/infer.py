@@ -10,7 +10,7 @@ def test_inference():
     model = TransformerDiarizationModel(config.num_speakers, config.num_events, config.num_moods)
     
     # Load the checkpoint with the model parameters.
-    model.load_state_dict(torch.load("diarization_model.pth", map_location=device))
+    model.load_state_dict(torch.load(config.save_model_path, map_location=device))
     
     # Move the model to the appropriate device.
     model.to(device)

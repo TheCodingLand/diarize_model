@@ -69,7 +69,7 @@ def train():
     config.save()
 
     print("Training completed!")
-    torch.save(model.state_dict(), "diarization_model.pth")
+    torch.save(model.state_dict(), config.save_model_path)
 
 if __name__ == "__main__":
     train()
