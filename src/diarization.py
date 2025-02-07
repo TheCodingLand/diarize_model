@@ -3,17 +3,17 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset
-import numpy as np
-from transformers import Wav2Vec2Model
+
+from transformers import Wav2Vec2Model  
 from settings import config 
-from typing import Tuple
+from typing import Any, Tuple
 
 try: 
-    from clearml import Task
+    from clearml import Task # type: ignore 
     try:
-        task = Task.init(project_name="my_project", task_name="experiment_1")
+        task = Task.init(project_name="my_project", task_name="experiment_1") # type: ignore
     except Exception as e:
-        task = Task.current_task()
+        task = Task.current_task() # type: ignore
 
 except ImportError:
     pass
@@ -21,7 +21,7 @@ except ImportError:
 
 class ArcFaceLoss(nn.Module):
     def __init__(self, scale: float = 30.0, margin: float = 0.50) -> None:
-        super(ArcFaceLoss, self).__init__()
+        super(ArcFaceLoss, self).__init__() # type: ignore
         self.scale = scale
         self.margin = margin
         self.cos_m = torch.cos(torch.tensor(margin))
@@ -37,7 +37,7 @@ class ArcFaceLoss(nn.Module):
         return F.cross_entropy(logits_modified, labels)
 
 # Synthetic Dataset: generates synthetic waveforms and per–time–step labels.
-class SyntheticDiarizationDataset(Dataset):
+class SyntheticDiarizationDataset(Dataset[Any]):
     def __init__(self, num_samples: int = 1000, num_speakers: int = 5, num_events: int = 3, num_moods: int = 4) -> None:
         self.num_samples = num_samples
         self.num_speakers = num_speakers
@@ -58,8 +58,8 @@ class SyntheticDiarizationDataset(Dataset):
 # Model combining Wav2Vec2 & Transformer for diarization.
 class TransformerDiarizationModel(nn.Module):
     def __init__(self, num_speakers: int, num_events: int, num_moods: int, num_layers: int = 4, nhead: int = 8) -> None:
-        super(TransformerDiarizationModel, self).__init__()
-        self.wav2vec = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h")
+        super(TransformerDiarizationModel, self).__init__() # type: ignore
+        self.wav2vec : Wav2Vec2Model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h") # type: ignore
         # Project synthetic 40-dimensional input to a single channel waveform.
         self.feature_projection = nn.Linear(config.input_features, 1)
         # The Wav2Vec2 model outputs hidden states of size 768.
@@ -85,16 +85,17 @@ class TransformerDiarizationModel(nn.Module):
         event_logits = self.event_head(x)
         mood_logits = self.mood_head(x)
         # Interpolate logits along the time axis to match the original seq_length.
-        speaker_logits = F.interpolate(speaker_logits.transpose(1, 2),
+        speaker_logits: torch.Tensor = F.interpolate(speaker_logits.transpose(1, 2),    # type: ignore
                                        size=config.seq_length,
                                        mode='linear',
                                        align_corners=False).transpose(1, 2)
-        event_logits = F.interpolate(event_logits.transpose(1, 2),
+        event_logits: torch.Tensor = F.interpolate(event_logits.transpose(1, 2),        # type: ignore
                                      size=config.seq_length,
                                      mode='linear',
-                                     align_corners=False).transpose(1, 2)
-        mood_logits = F.interpolate(mood_logits.transpose(1, 2),
+                                     align_corners=False).transpose(1, 2) # type: ignore
+        mood_logits: torch.Tensor = F.interpolate(mood_logits.transpose(1, 2),  # type: ignore
                                     size=config.seq_length,
                                     mode='linear',
-                                    align_corners=False).transpose(1, 2)
-        return speaker_logits, event_logits, mood_logits
+                                    align_corners=False).transpose(1, 2) 
+        
+        return speaker_logits, event_logits, mood_logits  #type: ignore
