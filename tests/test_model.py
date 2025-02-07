@@ -4,6 +4,7 @@ import pytest
 from diarization import TransformerDiarizationModel
 from settings import config
 from diarization import ArcFaceLoss  # Adjust the import to your project structure
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def test_model_forward():
     # Define parameters matching the model/dataset configuration.
@@ -12,11 +13,14 @@ def test_model_forward():
     num_moods = 5
     batch_size = 2
 
-    # Create a dummy input with shape (batch, seq_length, input_features)
-    dummy_input = torch.randn(batch_size, config.seq_length, config.input_features)
+    # Set device to CUDA if available, otherwise CPU.
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Instantiate the model.
-    model = TransformerDiarizationModel(num_speakers, num_events, num_moods)
+    # Create a dummy input with shape (batch, seq_length, input_features) and move it to the device.
+    dummy_input = torch.randn(batch_size, config.seq_length, config.input_features).to(device)
+
+    # Instantiate the model and move it to the device.
+    model = TransformerDiarizationModel(num_speakers, num_events, num_moods).to(device)
     model.eval()  # Set to evaluation mode
 
     with torch.no_grad():
@@ -26,7 +30,8 @@ def test_model_forward():
     assert speaker_logits.shape == (batch_size, config.seq_length, num_speakers)
     assert event_logits.shape == (batch_size, config.seq_length, num_events)
     assert mood_logits.shape == (batch_size, config.seq_length, num_moods)
-
+    
+    print("Test passed: model forward output shapes are correct.")
 
 
 def test_arcface_loss_output_and_gradient():
