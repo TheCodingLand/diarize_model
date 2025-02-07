@@ -106,5 +106,5 @@ class TransformerDiarizationModel(nn.Module):
                                     size=config.seq_length,
                                     mode='linear',
                                     align_corners=False).transpose(1, 2) 
-        logging.critical(type(mood_logits))
+        
         return speaker_logits, event_logits, mood_logits  #type: ignore
