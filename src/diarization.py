@@ -1,4 +1,5 @@
 
+import logging
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -18,14 +19,15 @@ try:
 except ImportError:
     pass
 
+device: str = "cuda" if torch.cuda.is_available() else "cpu"
 
 class ArcFaceLoss(nn.Module):
     def __init__(self, scale: float = 30.0, margin: float = 0.50) -> None:
         super(ArcFaceLoss, self).__init__() # type: ignore
         self.scale = scale
         self.margin = margin
-        self.cos_m = torch.cos(torch.tensor(margin))
-        self.sin_m = torch.sin(torch.tensor(margin))
+        self.register_buffer('cos_m', torch.cos(torch.tensor(margin)))
+        self.register_buffer('sin_m', torch.sin(torch.tensor(margin)))
 
     def forward(self, logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         cosine: torch.Tensor = F.normalize(logits, dim=-1)
@@ -43,6 +45,7 @@ class SyntheticDiarizationDataset(Dataset[Any]):
         self.num_speakers = num_speakers
         self.num_events = num_events
         self.num_moods = num_moods
+        
 
     def __len__(self) -> int:
         return self.num_samples
@@ -53,6 +56,9 @@ class SyntheticDiarizationDataset(Dataset[Any]):
         speaker_labels: torch.Tensor = torch.randint(0, self.num_speakers, (config.seq_length,))
         event_labels: torch.Tensor = torch.randint(0, self.num_events, (config.seq_length,))
         mood_labels: torch.Tensor = torch.randint(0, self.num_moods, (config.seq_length,))
+        # update config data and save it
+        
+        
         return features, (speaker_labels, event_labels, mood_labels)
 
 # Model combining Wav2Vec2 & Transformer for diarization.
@@ -75,8 +81,11 @@ class TransformerDiarizationModel(nn.Module):
         # Project to shape (batch, seq_length, 1) and then squeeze to (batch, seq_length)
         x = self.feature_projection(x).squeeze(-1)
         # Feed the raw waveform to Wav2Vec2. It expects shape (batch, audio_length).
+        x = x.to(device)
         outputs = self.wav2vec(x)
         # Get the last hidden state with shape (batch, T, 768)
+        
+
         x = outputs.last_hidden_state
         x = self.embedding(x)
         x = self.transformer(x)
@@ -97,5 +106,5 @@ class TransformerDiarizationModel(nn.Module):
                                     size=config.seq_length,
                                     mode='linear',
                                     align_corners=False).transpose(1, 2) 
-        
+        logging.critical(type(mood_logits))
         return speaker_logits, event_logits, mood_logits  #type: ignore

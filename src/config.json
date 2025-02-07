@@ -1,0 +1,11 @@
+{
+    "num_speakers": 6,
+    "num_events": 4,
+    "num_moods": 5,
+    "input_features": 40,
+    "seq_length": 1000,
+    "hidden_size": 128,
+    "batch_size": 32,
+    "num_epochs": 2,
+    "learning_rate": 0.001
+}
