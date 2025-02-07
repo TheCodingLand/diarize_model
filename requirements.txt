@@ -6,3 +6,4 @@ torchaudio>=0.7.0
 pytest>=6.0.0
 pydantic
 pydantic-settings
+pydub
