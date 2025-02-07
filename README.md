@@ -1,7 +1,7 @@
 # Diarization Model with Wav2Vec2 & Transformer
 
 
-[![Tests](https://github.com/TheCodingLand/StarCitizenBindVkb/actions/workflows/test.yml/badge.svg)](https://github.com/TheCodingLand/StarCitizenBindVkb/actions/workflows/test.yml)
+[![Tests](https://github.com/TheCodingLand/diarize_model/actions/workflows/test.yml/badge.svg)](https://github.com/TheCodingLand/StarCitizenBindVkb/actions/workflows/test.yml)
 ![Coverage](./coverage.svg)
 
 
