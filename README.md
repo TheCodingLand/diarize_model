@@ -1,5 +1,10 @@
 # Diarization Model with Wav2Vec2 & Transformer
 
+
+[![Tests](https://github.com/TheCodingLand/StarCitizenBindVkb/actions/workflows/test.yml/badge.svg)](https://github.com/TheCodingLand/StarCitizenBindVkb/actions/workflows/test.yml)
+![Coverage](./coverage.svg)
+
+
 This repository contains a multi-task diarization model built with PyTorch. The model leverages a pre-trained [Wav2Vec2](https://huggingface.co/facebook/wav2vec2-base-960h) backbone combined with a Transformer encoder to perform the following tasks on audio inputs:
 - **Speaker Diarization**
 - **Event Detection**
