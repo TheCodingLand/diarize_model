@@ -3,6 +3,7 @@ import pytest
 # Adjust the import to match your project structure.
 from diarization import TransformerDiarizationModel
 from settings import config
+from diarization import ArcFaceLoss  # Adjust the import to your project structure
 
 def test_model_forward():
     # Define parameters matching the model/dataset configuration.
@@ -25,3 +26,28 @@ def test_model_forward():
     assert speaker_logits.shape == (batch_size, config.seq_length, num_speakers)
     assert event_logits.shape == (batch_size, config.seq_length, num_events)
     assert mood_logits.shape == (batch_size, config.seq_length, num_moods)
+
+
+
+def test_arcface_loss_output_and_gradient():
+    batch_size = 8
+    num_classes = 6
+
+    # Create dummy logits with requires_grad=True so we can check gradients.
+    logits = torch.randn(batch_size, num_classes, requires_grad=True)
+    # Create dummy labels as integers in the range [0, num_classes)
+    labels = torch.randint(0, num_classes, (batch_size,))
+
+    # Initialize the ArcFaceLoss.
+    loss_fn = ArcFaceLoss(scale=30.0, margin=0.50)
+    loss = loss_fn(logits, labels)
+
+    # Check that the loss is a scalar.
+    assert loss.dim() == 0, "Expected loss to be a scalar."
+
+    # Perform a backward pass to check gradient computation.
+    loss.backward()
+    assert logits.grad is not None, "Expected gradients for logits to be computed."
+
+    # Optionally, check that the gradient has the same shape as logits.
+    assert logits.grad.shape == logits.shape, "Gradient shape should match logits shape."
