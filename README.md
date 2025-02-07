@@ -53,29 +53,6 @@ You can replace or extend the synthetic dataset with your own data. Simply ensur
 - NumPy
 - (Optional) [torchaudio](https://pytorch.org/audio/stable/) for data preprocessing
 
-Install the dependencies via:
-
-```bash
-pip install -r requirements.txt
-```
-
-## Installation
-
-Clone the repository and set up your virtual environment:
-
-```bash
-git clone https://github.com/yourusername/diarization-model.git
-cd diarization-model
-
-python -m venv venv
-# Activate the environment (Linux/Mac)
-source venv/bin/activate
-# or on Windows
-venv\Scripts\activate
-
-pip install -r requirements.txt
-```
-
 ## Usage
 
 ### Training the Model
@@ -107,27 +84,6 @@ python infer.py
 For real-world applications, you might want to preprocess your audio files. Below is an example of a preprocessing function (`preprocessing.py`) that loads an audio file, resamples it to a target sample rate, and normalizes it:
 
 ```python
-import torchaudio
-import torch
-
-def preprocess_audio(file_path: str, target_sample_rate: int = 16000) -> torch.Tensor:
-    """
-    Load and preprocess an audio file.
-
-    Parameters:
-        file_path (str): Path to the audio file.
-        target_sample_rate (int): The desired sample rate.
-
-    Returns:
-        torch.Tensor: Normalized audio waveform.
-    """
-    waveform, sample_rate = torchaudio.load(file_path)
-    if sample_rate != target_sample_rate:
-        resampler = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=target_sample_rate)
-        waveform = resampler(waveform)
-    # Normalize the waveform: zero mean and unit variance
-    waveform = (waveform - waveform.mean()) / (waveform.std() + 1e-5)
-    return waveform
 ```
 
 Integrate this function into your data loading pipeline when working with real audio files.

@@ -1,0 +1,6 @@
+torch>=1.7.0
+transformers>=4.0.0
+clearml>=1.0.0
+numpy>=1.19.2
+torchaudio>=0.7.0
+pytest>=6.0.0
